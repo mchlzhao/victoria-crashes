@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Adapted from https://www.mapbox.com/mapbox-gl-js/example/geojson-markers/ -->
+  <meta charset='utf-8'>
+  <title>Victoria Crashes in 2016</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.38.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.38.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+      body { margin:0; padding:0; }
+      #map { position:absolute; top:0; bottom:0; width:100%; }
+      .mapboxgl-popup { font-size: 75%; line-height: 1.15; }
+  </style>
+</head>
+<body>
+
+  <div id='map'></div>
+  <script src="layer.js"></script>
+  <script>
+  mapboxgl.accessToken = 'pk.eyJ1Ijoic3BheGUiLCJhIjoiY2o0Z3RvbXJ2MDZzYTJ3cmg1dG1oZzA1biJ9.zflK9N9CVcEsVcIpqBe0ag';
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [144.963056, -37.813611], // Melbourne
+    zoom: 10, // higher is closer
+    hash: true
+  });
+
+  // Adding a popup on mouse hover
+  var popup = new mapboxgl.Popup({
+    closeOnClick: false
+  });
+
+  map.on('load', function () {
+
+    // Load data from URL, in this case it's in the same folder
+    fetch('Crashes_2016.geojson').then(async data => {
+
+      // Save data to a map source so we can refer to it later.
+      map.addSource('victoria-crashes', {
+        type: 'geojson',
+        data: await data.json()
+      });
+
+      map.addLayer(layer);
+
+      map.on('click', 'victoria', function(e) {
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = 'pointer';
+
+        let html = "";
+        for (let prop in e.features[0].properties) {
+          html += `<strong>${prop}:</strong> ${e.features[0].properties[prop]}<br>`;
+        }
+
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        popup.setLngLat(e.features[0].geometry.coordinates)
+            .setHTML(html)
+            .addTo(map);
+
+        // Clicking on the dot will show its property in the web inspector
+        // You can access the inspector via Ctrl+Shift+I, or Command+Options+I
+        console.log(e.features[0].properties);
+      });
+
+      // Change the cursor to a pointer when the mouse is over the places layer.
+      map.on('mouseenter', 'victoria', function () {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.on('mouseleave', 'victoria', function() {
+        map.getCanvas().style.cursor = '';
+      });
+
+    // If the file fails to load, log an error in the console.
+    }).catch(err => {
+      console.error(err);
+    });
+
+  });
+  </script>
+
+</body>
+</html>
