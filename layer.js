@@ -22,16 +22,16 @@ var layer = {
     'circle-color': {
 
       // Name of property to drive style from
-      property: 'FATALITY',
+      property: 'ALCOHOLTIME',
 
       // Type of styling. Can be 'exponential', 'interval', or 'categorical'
-      type: 'interval',
+      type: 'categorical',
 
       // Change colors based on values. 0 is blue, and 1 is red.
       // See http://www.colourlovers.com/palettes for some colour suggestions
       stops: [
-        [0, '#4E89ED'],
-        [1, '#FF5E7C'],
+		["No", "#FF5E7C"],
+        ["Yes", '#808080']
       ]
 
     // Properties are separated by commas
